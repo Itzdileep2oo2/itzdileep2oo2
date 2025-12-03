@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page QC Tool</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --success: #4ade80;
+            --warning: #facc15;
+            --error: #f87171;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--border);
+        }
+
+        .btn-danger {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .url-input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"],
+        input[type="url"] {
+            width: 100%;
+            padding: 0.625rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: 2px solid var(--primary);
+            border-color: transparent;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-value {
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .status-pass {
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .status-fail {
+            color: var(--error);
+            border-color: var(--error);
+        }
+
+        .status-warn {
+            color: var(--warning);
+            border-color: var(--warning);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .preview-section {
+            margin-top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .preview-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .iframe-container {
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        iframe {
+            background-color: white;
+            border: none;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            transition: width 0.3s;
+        }
+
+        .log-section {
+            background-color: #1e293b;
+            color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-error {
+            color: #f87171;
+        }
+
+        .log-success {
+            color: #4ade80;
+        }
+
+        .log-info {
+            color: #94a3b8;
+        }
+
+        .screenshot-thumb {
+            margin-top: 0.5rem;
+            max-width: 100%;
+            border: 2px solid #ef4444;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Loader */
+        .loader {
+            border: 3px solid var(--bg-color);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .url-header {
+            background: var(--card-bg);
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: 0.5rem;
+            border-left: 5px solid var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Landing Page QC Meme Edition 🎺</h1>
+            <button id="themeToggle" class="btn btn-outline">🌙 Dark Mode</button>
+        </header>
+
+        <div class="card">
+            <div class="grid-3">
+                <div class="input-group">
+                    <label>Landing Page URLs (Max 5)</label>
+                    <div id="urlInputsContainer">
+                        <div class="url-input-row">
+                            <input type="url" class="url-input" placeholder="https://example.com" required>
+                        </div>
+                    </div>
+                    <button id="addLinkBtn" class="btn btn-outline" style="margin-top: 0.5rem; width: 100%;">+ Add
+                        Another Link</button>
+                </div>
+                <div class="input-group">
+                    <label for="phoneInput">Expected Phone Number</label>
+                    <input type="text" id="phoneInput" placeholder="123-456-7890">
+                </div>
+                <div class="input-group">
+                    <label for="linkInput">Expected Appointment Link</label>
+                    <input type="text" id="linkInput" placeholder="https://calendly.com/...">
+                </div>
+            </div>
+            <button id="validateBtn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                Start Validation 🚀
+            </button>
+        </div>
+
+        <div id="resultsArea" class="hidden">
+            <!-- Results will be dynamically injected here -->
+            <div id="dynamicResults"></div>
+
+            <div class="preview-section hidden" id="previewSection">
+                <div class="preview-header">
+                    <h3>Live Preview</h3>
+                    <div class="preview-tabs">
+                        <button class="btn btn-primary" onclick="setPreview('mobile')">Mobile</button>
+                        <button class="btn btn-outline" onclick="setPreview('tablet')">Tablet</button>
+                        <button class="btn btn-outline" onclick="setPreview('desktop')">Desktop</button>
+                    </div>
+                </div>
+                <div class="iframe-container">
+                    <iframe id="previewFrame" width="375" height="667" title="Preview"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Recent Tests</h3>
+            <div id="historyList" class="history-list">
+                <!-- History items will go here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sounds -->
+    <audio id="sound-click" src="https://www.myinstants.com/media/sounds/discord-notification.mp3"></audio>
+    <audio id="sound-success" src="https://www.myinstants.com/media/sounds/tada_1.mp3"></audio>
+    <audio id="sound-error" src="https://www.myinstants.com/media/sounds/error.mp3"></audio>
+    <audio id="sound-wow" src="https://www.myinstants.com/media/sounds/anime-wow-sound-effect.mp3"></audio>
+    <audio id="sound-vine" src="https://www.myinstants.com/media/sounds/vine-boom.mp3"></audio>
+
+    <script>
+        // --- Configuration ---
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        const MAX_LINKS = 5;
+
+        // --- State ---
+        let currentUrl = '';
+
+        // --- DOM Elements ---
+        const themeToggle = document.getElementById('themeToggle');
+        const validateBtn = document.getElementById('validateBtn');
+        const addLinkBtn = document.getElementById('addLinkBtn');
+        const urlInputsContainer = document.getElementById('urlInputsContainer');
+        const phoneInput = document.getElementById('phoneInput');
+        const linkInput = document.getElementById('linkInput');
+        const resultsArea = document.getElementById('resultsArea');
+        const dynamicResults = document.getElementById('dynamicResults');
+        const previewFrame = document.getElementById('previewFrame');
+        const previewSection = document.getElementById('previewSection');
+
+        // --- Event Listeners ---
+        themeToggle.addEventListener('click', () => {
+            toggleTheme();
+            playSound('click');
+        });
+
+        validateBtn.addEventListener('click', startValidationQueue);
+
+        addLinkBtn.addEventListener('click', () => {
+            playSound('click');
+            const inputs = document.querySelectorAll('.url-input');
+            if (inputs.length < MAX_LINKS) {
+                const div = document.createElement('div');
+                div.className = 'url-input-row';
+                div.innerHTML = `
+                    <input type="url" class="url-input" placeholder="https://example.com">
+                    <button class="btn btn-danger" onclick="removeInput(this)">X</button>
+                `;
+                urlInputsContainer.appendChild(div);
+                if (document.querySelectorAll('.url-input').length >= MAX_LINKS) {
+                    addLinkBtn.disabled = true;
+                    addLinkBtn.textContent = 'Max Links Reached';
+                }
+            }
+        });
+
+        // --- Initialization ---
+        loadTheme();
+        loadHistory();
+
+        // --- Functions ---
+
+        function playSound(type) {
+            const sounds = {
+                'click': 'sound-click',
+                'success': 'sound-success',
+                'error': 'sound-error',
+                'wow': 'sound-wow',
+                'vine': 'sound-vine'
+            };
+            const id = sounds[type];
+            if (id) {
+                const audio = document.getElementById(id);
+                if (audio) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => console.log('Audio play failed:', e));
+                }
+            }
+        }
+
+        function removeInput(btn) {
+            playSound('click');
+            btn.parentElement.remove();
+            addLinkBtn.disabled = false;
+            addLinkBtn.textContent = '+ Add Another Link';
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            themeToggle.textContent = isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+
+        function createResultBlock(url, index) {
+            const id = `result-${index}`;
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'card';
+            div.innerHTML = `
+                <h3>Results for: <a href="${url}" target="_blank">${url}</a></h3>
+                <div class="status-grid">
+                    <div class="status-card" id="${id}-phone">
+                        <div class="status-icon">📞</div>
+                        <div class="status-label">Phone</div>
+                        <div class="status-value">Pending</div>
+                    </div>
+                    <div class="status-card" id="${id}-link">
+                        <div class="status-icon">🔗</div>
+                        <div class="status-label">Link</div>
+                        <div class="status-value">Pending</div>
+                    </div>
+                    <div class="status-card" id="${id}-layout">
+                        <div class="status-icon">📱</div>
+                        <div class="status-label">Layout</div>
+                        <div class="status-value">Pending</div>
+                    </div>
+                </div>
+                <div class="log-section" id="${id}-logs"></div>
+            `;
+            return div;
+        }
+
+        function logTo(id, message, type = 'info', image = null) {
+            const container = document.getElementById(id);
+            if (!container) return;
+
+            const div = document.createElement('div');
+            div.className = `log-entry log-${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+
+            if (image) {
+                const img = document.createElement('img');
+                img.src = image;
+                img.className = 'screenshot-thumb';
+                div.appendChild(img);
+            }
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function setStatus(blockId, type, status, text) {
+            const el = document.getElementById(`${blockId}-${type}`);
+            if (el) {
+                el.className = `status-card status-${status}`;
+                el.querySelector('.status-value').textContent = text;
+            }
+        }
+
+        function setPreview(mode) {
+            playSound('click');
+            const frame = document.getElementById('previewFrame');
+            const btns = document.querySelectorAll('.preview-tabs button');
+            btns.forEach(b => {
+                b.className = b.textContent.toLowerCase().includes(mode) ? 'btn btn-primary' : 'btn btn-outline';
+            });
+
+            if (mode === 'mobile') {
+                frame.width = 375;
+                frame.height = 667;
+            } else if (mode === 'tablet') {
+                frame.width = 768;
+                frame.height = 1024;
+            } else {
+                frame.width = 1024;
+                frame.height = 768;
+            }
+        }
+
+        async function startValidationQueue() {
+            playSound('click');
+            const inputs = Array.from(document.querySelectorAll('.url-input'));
+            const urls = inputs.map(i => i.value.trim()).filter(u => u);
+
+            if (urls.length === 0) {
+                alert('Please enter at least one URL');
+                playSound('error');
+                return;
+            }
+
+            validateBtn.disabled = true;
+            validateBtn.innerHTML = '<span class="loader"></span> Validating...';
+            resultsArea.classList.remove('hidden');
+            dynamicResults.innerHTML = '';
+            previewSection.classList.remove('hidden');
+
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
+                const blockId = `result-${i}`;
+                const block = createResultBlock(url, i);
+                dynamicResults.appendChild(block);
+
+                // Scroll to new block
+                block.scrollIntoView({ behavior: 'smooth' });
+
+                await validateSingleUrl(url, blockId);
+            }
+
+            validateBtn.disabled = false;
+            validateBtn.textContent = 'Start Validation 🚀';
+            playSound('success');
+        }
+
+        async function validateSingleUrl(url, blockId) {
+            const logId = `${blockId}-logs`;
+            logTo(logId, `Fetching content from ${url}...`);
+
+            try {
+                // Fetch via Proxy
+                const response = await fetch(CORS_PROXY + encodeURIComponent(url));
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+
+                let html = await response.text();
+
+                // Inject base tag
+                const baseTag = `<base href="${url}">`;
+                if (html.includes('<head>')) {
+                    html = html.replace('<head>', `<head>${baseTag}`);
+                } else {
+                    html = baseTag + html;
+                }
+
+                // Load into iframe for analysis
+                previewFrame.srcdoc = html;
+
+                await new Promise(resolve => {
+                    previewFrame.onload = resolve;
+                    // Fallback timeout
+                    setTimeout(resolve, 5000);
+                });
+
+                // Wait a bit for JS in iframe to potentially run
+                await new Promise(r => setTimeout(r, 1000));
+
+                const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+
+                // 1. Content Validation
+                await validateContent(doc, logId, blockId);
+
+                // 2. Responsiveness (Layout)
+                await validateResponsiveness(html, logId, blockId);
+
+                addToHistory(url, 'Completed');
+
+            } catch (err) {
+                logTo(logId, `Error: ${err.message}`, 'error');
+                playSound('error');
+                addToHistory(url, 'Failed');
+            }
+        }
+
+        function normalizePhone(phone) {
+            return phone.replace(/[^0-9]/g, '');
+        }
+
+        async function takeScreenshot(element) {
+            try {
+                const canvas = await html2canvas(element, {
+                    useCORS: true,
+                    logging: false
+                });
+                return canvas.toDataURL('image/png');
+            } catch (e) {
+                console.error("Screenshot failed", e);
+                return null;
+            }
+        }
+
+        async function validateContent(doc, logId, blockId) {
+            // Phone Validation
+            const expectedPhone = phoneInput.value.trim();
+            if (expectedPhone) {
+                const normalizedExpected = normalizePhone(expectedPhone);
+                const links = Array.from(doc.querySelectorAll('a[href^="tel:"], button'));
+                let found = false;
+
+                for (const el of links) {
+                    const href = el.getAttribute('href') || '';
+                    const text = el.textContent || '';
+                    if (href.includes('tel:') && normalizePhone(href).includes(normalizedExpected)) found = true;
+                    if (normalizePhone(text).includes(normalizedExpected)) found = true;
+                }
+
+                if (found) {
+                    setStatus(blockId, 'phone', 'pass', 'Found');
+                    logTo(logId, `Phone number ${expectedPhone} found.`, 'success');
+                    playSound('wow');
+                } else {
+                    setStatus(blockId, 'phone', 'fail', 'Missing');
+                    logTo(logId, `Phone number ${expectedPhone} NOT found.`, 'error');
+                    playSound('vine');
+                }
+            } else {
+                setStatus(blockId, 'phone', 'warn', 'Skipped');
+            }
+
+            // Link Validation
+            const expectedLink = linkInput.value.trim();
+            if (expectedLink) {
+                const links = Array.from(doc.querySelectorAll('a'));
+                let found = false;
+                let unauthorizedLinks = [];
+
+                for (const el of links) {
+                    const href = el.getAttribute('href');
+                    if (!href) continue;
+                    const cleanHref = href.trim();
+
+                    if (cleanHref === expectedLink) {
+                        found = true;
+                    } else {
+                        const isTel = cleanHref.startsWith('tel:');
+                        const isAnchor = cleanHref.startsWith('#');
+                        const isJs = cleanHref.startsWith('javascript:');
+                        if (!isTel && !isAnchor && !isJs) {
+                            unauthorizedLinks.push({ el, href: cleanHref });
+                        }
+                    }
+                }
+
+                if (found) {
+                    if (unauthorizedLinks.length > 0) {
+                        setStatus(blockId, 'link', 'fail', 'Bad Links');
+                        logTo(logId, `Expected link found, but ${unauthorizedLinks.length} unauthorized links detected.`, 'error');
+                        playSound('vine');
+
+                        // Screenshot first unauthorized link
+                        if (unauthorizedLinks[0].el) {
+                            unauthorizedLinks[0].el.style.border = "5px solid red";
+                            const screenshot = await takeScreenshot(doc.body); // Capture body to show context
+                            logTo(logId, `Unauthorized: ${unauthorizedLinks[0].href}`, 'error', screenshot);
+                        }
+                    } else {
+                        setStatus(blockId, 'link', 'pass', 'Perfect');
+                        logTo(logId, `Links are perfect.`, 'success');
+                        playSound('wow');
+                    }
+                } else {
+                    setStatus(blockId, 'link', 'fail', 'Missing');
+                    logTo(logId, `Expected link NOT found.`, 'error');
+                    playSound('error');
+                }
+            } else {
+                setStatus(blockId, 'link', 'warn', 'Skipped');
+            }
+        }
+
+        async function validateResponsiveness(html, logId, blockId) {
+            // We reuse the previewFrame. It's already loaded with content.
+            // We just resize it and check for issues.
+
+            const breakpoints = [
+                { name: 'Mobile', width: 375 },
+                { name: 'Desktop', width: 1024 }
+            ];
+
+            let allGood = true;
+
+            for (const bp of breakpoints) {
+                previewFrame.width = bp.width;
+                await new Promise(r => setTimeout(r, 500)); // Wait for resize
+
+                const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                const scrollWidth = doc.documentElement.scrollWidth;
+                const clientWidth = doc.documentElement.clientWidth;
+
+                if (scrollWidth > clientWidth + 1) {
+                    allGood = false;
+                    logTo(logId, `${bp.name}: Horizontal scroll detected!`, 'error');
+                    playSound('vine');
+                    // Screenshot
+                    const screenshot = await takeScreenshot(doc.body);
+                    logTo(logId, 'Layout Issue Snapshot', 'error', screenshot);
+                }
+            }
+
+            if (allGood) {
+                setStatus(blockId, 'layout', 'pass', 'Good');
+                logTo(logId, 'Layout checks passed.', 'success');
+            } else {
+                setStatus(blockId, 'layout', 'fail', 'Issues');
+            }
+        }
+
+        function addToHistory(url, status) {
+            const history = JSON.parse(localStorage.getItem('qc_history') || '[]');
+            history.unshift({ url, status, date: new Date().toISOString() });
+            if (history.length > 10) history.pop();
+            localStorage.setItem('qc_history', JSON.stringify(history));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('qc_history') || '[]');
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+
+            history.forEach(item => {
+                const li = document.createElement('div');
+                li.className = 'history-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${item.url}</strong><br>
+                        <small>${new Date(item.date).toLocaleString()}</small>
+                    </div>
+                    <span class="${item.status === 'Completed' ? 'log-success' : 'log-error'}">${item.status}</span>
+                `;
+                list.appendChild(li);
+            });
+        }
+    </script>
+</body>
+
+</html>
